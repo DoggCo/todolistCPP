@@ -3,13 +3,19 @@
 #include <string>
 #include <fstream>
 
-struct task {
+struct Task {
     std::string taskName;
     int status = 0;
 };
-std::vector<task> tasks;
+struct TaskList {
+    std::string listName;
+    std::vector<Task> tasks;
+};
+std::vector<TaskList> tasks;
+int currentList = 0;
+
 void addTask(std::string name, char status) {
-    task newTask;
+    Task newTask;
     newTask.taskName = name;
     if (status == 'y') {
         newTask.status = 1;
@@ -18,57 +24,26 @@ void addTask(std::string name, char status) {
     } else {
         newTask.status = 2;
     }
-    tasks.push_back(newTask);
-}
-void removeTask(int id) {
-    tasks.erase(tasks.begin() + id - 1);
+    tasks[currentList].tasks.push_back(newTask);
 }
 void viewTasks() {
-    for (int i = 0; i < tasks.size(); i++) {
+    std::cout << tasks[currentList].listName << "\n";
+    TaskList viewTask;
+    for (int i = 0; i < tasks[currentList].tasks.size(); i++) {
         char status = ' ';
-        if (tasks[i].status == 0) {
+        if (tasks[currentList].tasks[i].status == 0) {
             status = ' ';
-        } else if (tasks[i].status == 1) {
+        } else if (tasks[currentList].tasks[i].status == 1) {
             status = 'x';
         } else {
             status = '/';
         }
-        std::cout << i + 1 << " [" << status << "] " << tasks[i].taskName << "\n";
+        std::cout << i + 1 << " [" << status << "] " << tasks[currentList].tasks[i].taskName << "\n";
     }
 }
-void modifyTask(int id, std::string newName, char status) {
-    tasks[id - 1].taskName = newName;
-    if (status == 'y') {
-        tasks[id - 1].status = 1;
-    } else if (status == 'n') {
-        tasks[id - 1].status = 0;
-    } else {
-        tasks[id - 1].status = 2;
-    }
-}
-void save() {
-    std::ofstream outFile("tasks.txt");
-    for (const auto& t : tasks) {
-        outFile << t.status << "|" << t.taskName << "\n";
-    }
-    outFile.close();
-}
-void load() {
-    std::ifstream inFile("tasks.txt");
-    std::string line;
-    while (std::getline(inFile, line)) {
-        size_t separator = line.find('|');
-        if (separator != std::string::npos) {
-            task t;
-            t.status = std::stoi(line.substr(0, separator));
-            t.taskName = line.substr(separator + 1);
-            tasks.push_back(t);
-        }
-    }
-    inFile.close();
-}
+
 int main() {
-    load();
+    // load();
     std::string cmd;
     int id;
     std::string name;
@@ -77,24 +52,22 @@ int main() {
         std::cin >> cmd;
         if (cmd == "new") {
             std::cin >> status;
-            std::getline(std::cin >> std::ws, name);
+            std::cin >> name;
             addTask(name, status);
         } else if (cmd == "view") {
             viewTasks();
         } else if (cmd == "modify") {
-            std::cin >> id;
-            std::cin >> status;
-            std::getline(std::cin >> std::ws, name);
-            modifyTask(id, name, status);
+
         } else if (cmd == "delete") {
+
+        } else if (cmd == "newList") {
+            std::cin >> name;
+            TaskList newList;
+            newList.listName = name;
+            tasks.push_back(newList);
+        } else if (cmd == "switch") {
             std::cin >> id;
-            removeTask(id);
-        } else if (cmd == "exit") {
-            save();
-            break;
-        } else {
-            std::cout << "????\n";
+            currentList = id;
         }
     }
-    return 0;
 }
