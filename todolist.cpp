@@ -3,114 +3,98 @@
 #include <string>
 #include <fstream>
 
-std::vector<std::string> tasks;
-void addTask() {
-    std::cout << "Please enter task: ";
-    std::string enter;
-    std::getline(std::cin >> std::ws, enter);
-    tasks.push_back(enter);
+struct task {
+    std::string taskName;
+    int status = 0;
+};
+std::vector<task> tasks;
+void addTask(std::string name, char status) {
+    task newTask;
+    newTask.taskName = name;
+    if (status == 'y') {
+        newTask.status = 1;
+    } else if (status == 'n') {
+        newTask.status = 0;
+    } else {
+        newTask.status = 2;
+    }
+    tasks.push_back(newTask);
+}
+void removeTask(int id) {
+    tasks.erase(tasks.begin() + id - 1);
 }
 void viewTasks() {
     for (int i = 0; i < tasks.size(); i++) {
-        std::cout << tasks[i] << "\n";
+        char status = ' ';
+        if (tasks[i].status == 0) {
+            status = ' ';
+        } else if (tasks[i].status == 1) {
+            status = 'x';
+        } else {
+            status = '/';
+        }
+        std::cout << i + 1 << " [" << status << "] " << tasks[i].taskName << "\n";
     }
-    std::cin.ignore();
-    std::cin.get();
 }
-void removeTask() {
-    std::cout <<"\n";
-    for (int i = 0; i < tasks.size(); i++) {
-        std::cout << i + 1 << " - " << tasks[i] << "\n";
+void modifyTask(int id, std::string newName, char status) {
+    tasks[id - 1].taskName = newName;
+    if (status == 'y') {
+        tasks[id - 1].status = 1;
+    } else if (status == 'n') {
+        tasks[id - 1].status = 0;
+    } else {
+        tasks[id - 1].status = 2;
     }
-    int del = 0;
-    std::cout << "Enter number of task to delete (-1 for all tasks, 0 to go back): ";
-    std::cin >> del;
-    if (del == 0) {
-        return;
-    }
-    if (del == -1) {
-        tasks.clear();
-        return;
-    }
-    tasks.erase(tasks.begin() + del - 1);
-}
-void modifyTask() {
-    std::cout <<"\n";
-    for (int i = 0; i < tasks.size(); i++) {
-        std::cout << i + 1 << " - " << tasks[i] << "\n";
-    }
-    int modify = 0;
-    std::string newTask;
-    std::cout << "Enter number of task to modify: ";
-    std::cin >> modify;
-    std::cout << "Enter new task: ";
-    std::cin >> newTask;
-    tasks[modify - 1] = newTask;
-}
-
-int menu() {
-    std::cout << "--- Tasks ---\n\n";
-    std::cout << "1 - Add task\n";
-    std::cout << "2 - Remove task\n";
-    std::cout << "3 - Modify task\n";
-    std::cout << "4 - View tasks\n";
-    std::cout << "0 - Save & Exit\n";
-    int choice = 0;
-    std::cin >> choice;
-    return choice;
 }
 void save() {
-    std::ofstream outFile("ez4ence.txt");
-    for (const auto& line : tasks) {
-        outFile << line << "\n";
+    std::ofstream outFile("tasks.txt");
+    for (const auto& t : tasks) {
+        outFile << t.status << "|" << t.taskName << "\n";
     }
     outFile.close();
 }
-
-int main() {
-    std::ifstream inFile("ez4ence.txt");
+void load() {
+    std::ifstream inFile("tasks.txt");
     std::string line;
     while (std::getline(inFile, line)) {
-        tasks.push_back(line);
-    }
-    inFile.close();
-    while (true) {
-        int choice = menu();
-        switch (choice) {
-            case 1:
-            addTask();
-            break;
-
-            case 2:
-            removeTask();
-            break;
-
-            case 3:
-            modifyTask();
-            break;
-
-            case 4:
-            viewTasks();
-            break;
-
-            case 0:
-            save();
-            return 0;
+        size_t separator = line.find('|');
+        if (separator != std::string::npos) {
+            task t;
+            t.status = std::stoi(line.substr(0, separator));
+            t.taskName = line.substr(separator + 1);
+            tasks.push_back(t);
         }
     }
+    inFile.close();
 }
-
-/*
-TODO:
-
-use a struct to show finished tasks, maybe add seperate task "lists", which is just different arrays
-
-struct task {
-    std::string text;
-    bool completed = false;
-};
-
-[ ] Buy money
-[x] Mcdonalds
-
-*/
+int main() {
+    load();
+    std::string cmd;
+    int id;
+    std::string name;
+    char status;
+    while (true) {
+        std::cin >> cmd;
+        if (cmd == "new") {
+            std::cin >> status;
+            std::cin >> name;
+            addTask(name, status);
+        } else if (cmd == "view") {
+            viewTasks();
+        } else if (cmd == "modify") {
+            std::cin >> id;
+            std::cin >> status;
+            std::cin >> name;
+            modifyTask(id, name, status);
+        } else if (cmd == "delete") {
+            std::cin >> id;
+            removeTask(id);
+        } else if (cmd == "exit") {
+            save();
+            break;
+        } else {
+            std::cout << "????\n";
+        }
+    }
+    return 0;
+}
