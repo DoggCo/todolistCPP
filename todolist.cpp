@@ -77,14 +77,14 @@ int main() {
         std::cin >> cmd;
         if (cmd == "new") {
             std::cin >> status;
-            std::cin >> name;
+            std::getline(std::cin >> std::ws, name);
             addTask(name, status);
         } else if (cmd == "view") {
             viewTasks();
         } else if (cmd == "modify") {
             std::cin >> id;
             std::cin >> status;
-            std::cin >> name;
+            std::getline(std::cin >> std::ws, name);
             modifyTask(id, name, status);
         } else if (cmd == "delete") {
             std::cin >> id;
