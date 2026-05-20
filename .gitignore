@@ -2,3 +2,4 @@ main
 main.exe
 todolist.exe
 *.txt
+.vscode

@@ -27,7 +27,6 @@ void addTask(std::string name, char status) {
     tasks[currentList].tasks.push_back(newTask);
 }
 void viewTasks() {
-    // std::cout << tasks[currentList].listName << "\n";
     TaskList viewTask;
     for (int i = 0; i < tasks[currentList].tasks.size(); i++) {
         char status = ' ';
@@ -59,6 +58,10 @@ void modifyTasks(std::string name, char status, int id) {
 void deleteTask(int id) {
     tasks[currentList].tasks.erase(tasks[currentList].tasks.begin() + id);
 }
+void deleteList(int id) {
+    tasks.erase(tasks.begin() + id);
+    currentList = 0;
+}
 
 int main() {
     // load();
@@ -87,12 +90,15 @@ int main() {
             modifyTasks(name, status, id - 1);
         } else if (cmd == "delete") {
             std::cin >> id;
-            deleteTask(id);
+            deleteTask(id - 1);
         } else if (cmd == "newList") {
             std::cin >> name;
             TaskList newList;
             newList.listName = name;
             tasks.push_back(newList);
+        } else if (cmd == "delList") {
+            std::cin >> id;
+            deleteList(id - 1);
         } else if (cmd == "switch") {
             std::cin >> id;
             currentList = id - 1;
