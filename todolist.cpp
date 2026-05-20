@@ -2,6 +2,7 @@
 #include <iostream>
 #include <string>
 #include <fstream>
+#include <filesystem>
 
 struct Task {
     std::string taskName;
@@ -62,12 +63,57 @@ void deleteList(int id) {
     tasks.erase(tasks.begin() + id);
     currentList = 0;
 }
+void deleteTxt() {
+    for (const auto& entry : std::filesystem::directory_iterator(".")) {
+        if (entry.path().extension() == ".txt") {
+            std::filesystem::remove(entry.path());
+        }
+    }
+}
+
+void save() {
+    deleteTxt();
+    for (const auto& list : tasks) {
+        std::string filename = list.listName + ".txt";
+        std::ofstream out(filename);
+        for (const auto& t : list.tasks) {
+            out << t.status << "|" << t.taskName << "\n";
+        }
+    }
+}
+void load() {
+    tasks.clear();
+    for (const auto& entry : std::filesystem::directory_iterator(".")) {
+        if (entry.path().extension() == ".txt") {
+            TaskList list;
+            list.listName = entry.path().stem().string();
+            std::ifstream in(entry.path());
+            std::string line;
+            while (std::getline(in, line)) {
+                size_t sep = line.find('|');
+                if (sep != std::string::npos) {
+                    Task t;
+                    t.status = std::stoi(line.substr(0, sep));
+                    t.taskName = line.substr(sep + 1);
+                    list.tasks.push_back(t);
+                }
+            }
+            tasks.push_back(list);
+        }
+    }
+    if (!tasks.empty()) currentList = 0;
+}
+void renameList(std::string name) {
+    tasks[currentList].listName = name;
+}
 
 int main() {
-    // load();
-    TaskList n;
-    n.listName = "placeholder";
-    tasks.push_back(n);
+    load();
+    if (tasks.empty()) {
+        TaskList n;
+        n.listName = "placeholder";
+        tasks.push_back(n);
+    }
     std::string cmd;
     int id;
     std::string name;
@@ -104,6 +150,14 @@ int main() {
             currentList = id - 1;
         } else if (cmd == "clear") {
             std::cout << "\033[2J\033[H";
+        } else if (cmd == "rename") {
+            std::cin >> name;
+            renameList(name);
+        } else if (cmd == "exit") {
+            save();
+            break;
+        } else {
+            std::cout << "\n";
         }
     }
     return 0;
