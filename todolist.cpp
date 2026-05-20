@@ -27,7 +27,7 @@ void addTask(std::string name, char status) {
     tasks[currentList].tasks.push_back(newTask);
 }
 void viewTasks() {
-    std::cout << tasks[currentList].listName << "\n";
+    // std::cout << tasks[currentList].listName << "\n";
     TaskList viewTask;
     for (int i = 0; i < tasks[currentList].tasks.size(); i++) {
         char status = ' ';
@@ -43,8 +43,21 @@ void viewTasks() {
 }
 void viewLists() {
     for (int i = 0; i < tasks.size(); i++) {
-        std::cout << i + 1 << " " << tasks[i].listName << "\n";
+        std::cout << i + 1 << " - " << tasks[i].listName << "\n";
     }
+}
+void modifyTasks(std::string name, char status, int id) {
+    tasks[currentList].tasks[id].taskName = name;
+    if (status == 'y') {
+        tasks[currentList].tasks[id].status = 1;
+    } else if (status == 'n') {
+        tasks[currentList].tasks[id].status = 0;
+    } else {
+        tasks[currentList].tasks[id].status = 2;
+    }
+}
+void deleteTask(int id) {
+    tasks[currentList].tasks.erase(tasks[currentList].tasks.begin() + id);
 }
 
 int main() {
@@ -68,9 +81,13 @@ int main() {
         } else if (cmd == "viewLists") {
             viewLists();
         } else if (cmd == "modify") {
-
+            std::cin >> id;
+            std::cin >> status;
+            std::cin >> name;
+            modifyTasks(name, status, id - 1);
         } else if (cmd == "delete") {
-
+            std::cin >> id;
+            deleteTask(id);
         } else if (cmd == "newList") {
             std::cin >> name;
             TaskList newList;
@@ -79,6 +96,9 @@ int main() {
         } else if (cmd == "switch") {
             std::cin >> id;
             currentList = id - 1;
+        } else if (cmd == "clear") {
+            std::cout << "\033[2J\033[H";
         }
     }
+    return 0;
 }
