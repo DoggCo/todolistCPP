@@ -15,6 +15,15 @@ struct TaskList {
 std::vector<TaskList> tasks;
 int currentList = 0;
 
+int safe() { //TODO: not working as I want it to.
+	int number;
+	if (!(std::cin >> number)) {
+		std::cin.clear();
+		std::cin.ignore(10000, '\n');
+        return -1;
+	}
+	return number;
+}
 bool idCheck(int id) {
     if (id >= tasks[currentList].tasks.size() || id < 0) {
         std::cout << "Returning.\n";
@@ -168,7 +177,7 @@ int main() {
         } else if (cmd == "viewLists") {
             viewLists();
         } else if (cmd == "modify") {
-            std::cin >> id;
+            id = safe();
             std::cin >> status;
             std::getline(std::cin >> std::ws, name);
             modifyTasks(name, status, id - 1);
