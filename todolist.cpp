@@ -157,7 +157,7 @@ int main() {
         std::cin >> cmd;
         if (cmd == "new") {
             std::cin >> status;
-            std::cin >> name;
+            std::getline(std::cin >> std::ws, name);
             addTask(name, status);
         } else if (cmd == "view") {
             viewTasks();
@@ -166,13 +166,13 @@ int main() {
         } else if (cmd == "modify") {
             std::cin >> id;
             std::cin >> status;
-            std::cin >> name;
+            std::getline(std::cin >> std::ws, name);
             modifyTasks(name, status, id - 1);
         } else if (cmd == "delete") {
             std::cin >> id;
             deleteTask(id - 1);
         } else if (cmd == "newList") {
-            std::cin >> name;
+            std::getline(std::cin >> std::ws, name); // Maybe shouldn't use spaces. Whatever.
             TaskList newList;
             newList.listName = name;
             tasks.push_back(newList);
@@ -185,7 +185,7 @@ int main() {
         } else if (cmd == "clear") {
             std::cout << "\033[2J\033[H";
         } else if (cmd == "rename") {
-            std::cin >> name;
+            std::getline(std::cin >> std::ws, name); // Also probably shouldn't use spaces. Also whatever.
             renameList(name);
         } else if (cmd == "exit") {
             save();
