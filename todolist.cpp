@@ -17,12 +17,13 @@ int currentList = 0;
 
 int safe() { //TODO: not working as I want it to.
 	int number;
-	if (!(std::cin >> number)) {
-		std::cin.clear();
-		std::cin.ignore(10000, '\n');
-        return -1;
-	}
-	return number;
+
+    if (std::cin >> number) {
+        return number;
+    }
+    std::cin.clear();
+    std::cin.ignore(100000, '\n');
+    return -2;
 }
 bool idCheck(int id) {
     if (id >= tasks[currentList].tasks.size() || id < 0) {
@@ -178,6 +179,9 @@ int main() {
             viewLists();
         } else if (cmd == "modify") {
             id = safe();
+            if (id == -2) {
+                continue;
+            }
             std::cin >> status;
             std::getline(std::cin >> std::ws, name);
             modifyTasks(name, status, id - 1);
