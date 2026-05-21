@@ -15,6 +15,16 @@ struct TaskList {
 std::vector<TaskList> tasks;
 int currentList = 0;
 
+bool idCheck(int id) {
+    if (id >= tasks[currentList].tasks.size() || id < 0) {
+        std::cout << "Returning.\n";
+        return false;
+    }
+    return true;
+}
+bool listIdCheck(int id) {
+    return id >= 0 && id < tasks.size();
+}
 void addTask(std::string name, char status) {
     Task newTask;
     newTask.taskName = name;
@@ -47,6 +57,9 @@ void viewLists() {
     }
 }
 void modifyTasks(std::string name, char status, int id) {
+    if (!idCheck(id)) {
+        return;
+    }
     tasks[currentList].tasks[id].taskName = name;
     if (status == 'y') {
         tasks[currentList].tasks[id].status = 1;
@@ -57,9 +70,15 @@ void modifyTasks(std::string name, char status, int id) {
     }
 }
 void deleteTask(int id) {
+    if (!idCheck(id)) {
+        return;
+    }
     tasks[currentList].tasks.erase(tasks[currentList].tasks.begin() + id);
 }
 void deleteList(int id) {
+    if (!listIdCheck(id)) {
+        return;
+    }
     tasks.erase(tasks.begin() + id);
     currentList = 0;
 }
@@ -106,12 +125,27 @@ void load() {
 void renameList(std::string name) {
     tasks[currentList].listName = name;
 }
+void help() {
+    std::cout << "\nThe current TODO-list you're using will be displayed to the left.\n";
+    std::cout << "new         y|n|/   TASKNAME\n";
+    std::cout << "modify  ID  y|n|/   TASKNAME\n";
+    std::cout << "delete  ID                  \n";
+    std::cout << "view                      \n\n";
 
+    std::cout << "newList             LISTNAME\n";
+    std::cout << "switch              LISTNAME\n";
+    std::cout << "delList             LIST ID \n";
+    std::cout << "viewLists                   \n";
+    std::cout << "rename              LISTNAME\n\n";
+    
+    std::cout << "exit                        \n";
+    std::cout << "clear                     \n\n";
+}
 int main() {
     load();
     if (tasks.empty()) {
         TaskList n;
-        n.listName = "placeholder";
+        n.listName = "To-Do";
         tasks.push_back(n);
     }
     std::string cmd;
@@ -156,6 +190,8 @@ int main() {
         } else if (cmd == "exit") {
             save();
             break;
+        } else if (cmd == "help") {
+            help();
         } else {
             std::cout << "\n";
         }
