@@ -70,6 +70,10 @@ void modifyTasks(std::string name, char status, int id) {
     }
 }
 void deleteTask(int id) {
+    if (id == -2) {
+        tasks[currentList].tasks.clear();
+        return;
+    }
     if (!idCheck(id)) {
         return;
     }
@@ -127,19 +131,19 @@ void renameList(std::string name) {
 }
 void help() {
     std::cout << "\nThe current TODO-list you're using will be displayed to the left.\n";
-    std::cout << "new         y|n|/   TASKNAME\n";
-    std::cout << "modify  ID  y|n|/   TASKNAME\n";
-    std::cout << "delete  ID                  \n";
+    std::cout << "new          y|n|/   TASKNAME\n";
+    std::cout << "modify  ID   y|n|/   TASKNAME\n";
+    std::cout << "delete  ID (-1 for all tasks)\n";
     std::cout << "view                      \n\n";
 
-    std::cout << "newList             LISTNAME\n";
-    std::cout << "switch              LISTNAME\n";
-    std::cout << "delList             LIST ID \n";
-    std::cout << "viewLists                   \n";
-    std::cout << "rename              LISTNAME\n\n";
+    std::cout << "newList              LISTNAME\n";
+    std::cout << "switch               LIST ID \n";
+    std::cout << "delList              LIST ID \n";
+    std::cout << "viewLists                    \n";
+    std::cout << "rename     (current) LISTNAME\n\n";
     
-    std::cout << "exit                        \n";
-    std::cout << "clear                     \n\n";
+    std::cout << "exit                         \n";
+    std::cout << "clear                      \n\n";
 }
 int main() {
     load();
@@ -181,6 +185,9 @@ int main() {
             deleteList(id - 1);
         } else if (cmd == "switch") {
             std::cin >> id;
+            if (!listIdCheck(id - 1)) {
+                continue;
+            }
             currentList = id - 1;
         } else if (cmd == "clear") {
             std::cout << "\033[2J\033[H";
