@@ -15,9 +15,8 @@ struct TaskList {
 std::vector<TaskList> tasks;
 int currentList = 0;
 
-int safe() { //TODO: not working as I want it to.
+int safe() {
 	int number;
-
     if (std::cin >> number) {
         return number;
     }
@@ -81,7 +80,12 @@ void modifyTasks(std::string name, char status, int id) {
 }
 void deleteTask(int id) {
     if (id == -2) {
-        tasks[currentList].tasks.clear();
+        char yn;
+        std::cout << "Are you sure you want to delete all tasks from current list? (y/n): ";
+        std::cin >> yn;
+        if (yn == 'y') {
+            tasks[currentList].tasks.clear();
+        }
         return;
     }
     if (!idCheck(id)) {
@@ -153,7 +157,8 @@ void help() {
     std::cout << "rename     (current) LISTNAME\n\n";
     
     std::cout << "exit                         \n";
-    std::cout << "clear                      \n\n";
+    std::cout << "clear                        \n";
+    std::cout << "save                       \n\n";
 }
 int main() {
     load();
@@ -166,6 +171,7 @@ int main() {
     int id;
     std::string name;
     char status;
+    std::cout << "Run \"help\" to see commands\n";
     while (true) {
         std::cout << tasks[currentList].listName << ": ";
         std::cin >> cmd;
@@ -186,7 +192,10 @@ int main() {
             std::getline(std::cin >> std::ws, name);
             modifyTasks(name, status, id - 1);
         } else if (cmd == "delete") {
-            std::cin >> id;
+            id = safe();
+            if (id == -2) {
+                continue;
+            }
             deleteTask(id - 1);
         } else if (cmd == "newList") {
             std::getline(std::cin >> std::ws, name); // Maybe shouldn't use spaces. Whatever.
@@ -194,10 +203,16 @@ int main() {
             newList.listName = name;
             tasks.push_back(newList);
         } else if (cmd == "delList") {
-            std::cin >> id;
+            id = safe();
+            if (id == -2) {
+                continue;
+            }
             deleteList(id - 1);
         } else if (cmd == "switch") {
-            std::cin >> id;
+            id = safe();
+            if (id == -2) {
+                continue;
+            }
             if (!listIdCheck(id - 1)) {
                 continue;
             }
@@ -212,6 +227,8 @@ int main() {
             break;
         } else if (cmd == "help") {
             help();
+        } else if (cmd == "save") {
+            save();
         } else {
             std::cout << "\n";
         }
