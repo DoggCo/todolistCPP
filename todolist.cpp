@@ -92,7 +92,33 @@ class real {
     void renameList(std::string name) {
         tList[currentList].listName = name;
     }
+    void printCurrentList() {std::cout << tList[currentList].listName << ": ";}
+    real() {
+        if (tList.empty()) {
+            TaskList n;
+            n.listName = "ToDo";
+            tList.push_back(n);
+        }
+    }
 };
+
+void help() {
+    std::cout << "\nThe current TODO-list you're using will be displayed to the left.\n";
+    std::cout << "new          y|n|/   TASKNAME\n";
+    std::cout << "modify  ID   y|n|/   TASKNAME\n";
+    std::cout << "delete  ID (-1 for all tasks)\n";
+    std::cout << "view                      \n\n";
+
+    std::cout << "newList              LISTNAME\n";
+    std::cout << "switch               LIST ID \n";
+    std::cout << "delList              LIST ID \n";
+    std::cout << "viewLists                    \n";
+    std::cout << "rename     (current) LISTNAME\n\n";
+    
+    std::cout << "exit                         \n";
+    std::cout << "clear                        \n";
+    std::cout << "save                       \n\n";
+}
 
 int safe() {
     int number;
@@ -102,4 +128,23 @@ int safe() {
     std::cin.clear();
     std::cin.ignore(100000, '\n');
     return -2;
+}
+
+int main() {
+    real ez4ence;
+    // load();
+    std::string cmd;
+    int id;
+    std::string name;
+    char status;
+    std::cout << "welcome. run \"help\"";
+    while (true) {
+        ez4ence.printCurrentList();
+        std::cin >> cmd;
+        if (cmd == "new") {
+            std::cin >> status;
+            std::getline(std::cin >> std::ws, name);
+            ez4ence.addTask(name, status);
+        }
+    }
 }
