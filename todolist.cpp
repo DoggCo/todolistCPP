@@ -19,7 +19,7 @@ class real {
     std::vector<TaskList> tList;
 
     bool idCheck(int id) {
-        return id <= 0 && id < tList[currentList].tasks.size();
+        return id >= 0 && id < tList[currentList].tasks.size();
     }
     bool listIdCheck(int id) {
         return id >= 0 && id < tList.size();
@@ -31,6 +31,13 @@ class real {
             return 1;
         } else {
             return 2;
+        }
+    }
+    void deleteTxt() {
+        for (const auto& entry : std::filesystem::directory_iterator(".")) {
+            if (entry.path().extension() == ".txt") {
+                std::filesystem::remove(entry.path());
+            }
         }
     }
 
@@ -65,7 +72,7 @@ class real {
             return;
         }
         tList[currentList].tasks[id].taskName = name;
-        tList[currentList].tasks[id].status = (status);
+        tList[currentList].tasks[id].status = charStatus(status);
     }
     void deleteTask(int id) {
         if (id == -2) {
@@ -93,7 +100,62 @@ class real {
         tList[currentList].listName = name;
     }
     void printCurrentList() {std::cout << tList[currentList].listName << ": ";}
+    void newList(std::string name) {
+        TaskList n;
+        n.listName = name;
+        tList.push_back(n);
+    }
+    void delList(int id) {
+        tList.erase(tList.begin() + id);
+        currentList = 0;
+    }
+    void switchList(int id) {
+        if (!listIdCheck(id)) {
+            return;
+        }
+        currentList = id;
+    }
+    void save() {
+        deleteTxt();
+
+        for (const auto& list : tList) {
+            std::string filename = list.listName + ".txt";
+            std::ofstream out(filename);
+
+            for (const auto& task : list.tasks) {
+                out << task.status << "|" << task.taskName << '\n';
+            }
+        }
+    }
+    void load() {
+        tList.clear();
+        for (const auto& entry : std::filesystem::directory_iterator(".")) {
+            if (entry.path().extension() == ".txt") {
+                TaskList list;
+                list.listName = entry.path().stem().string();
+                std::ifstream in(entry.path());
+                std::string line;
+                while (std::getline(in, line)) {
+                    size_t sep = line.find('|');
+                    if (sep != std::string::npos) {
+                        Task task;
+                        task.status = std::stoi(line.substr(0, sep));
+                        task.taskName = line.substr(sep + 1);
+                        list.tasks.push_back(task);
+                    }
+                }
+                tList.push_back(list);
+            }
+        }
+        currentList = 0;
+        if (tList.empty()) {
+            TaskList n;
+            n.listName = "ToDo";
+            tList.push_back(n);
+        }
+    }
     real() {
+        load();
         if (tList.empty()) {
             TaskList n;
             n.listName = "ToDo";
@@ -137,7 +199,7 @@ int main() {
     int id;
     std::string name;
     char status;
-    std::cout << "welcome. run \"help\"";
+    std::cout << "welcome. run \"help\"\n";
     while (true) {
         ez4ence.printCurrentList();
         std::cin >> cmd;
@@ -145,6 +207,54 @@ int main() {
             std::cin >> status;
             std::getline(std::cin >> std::ws, name);
             ez4ence.addTask(name, status);
+        } else if (cmd == "view") {
+            ez4ence.viewTasks();
+        } else if (cmd == "viewLists") {
+            ez4ence.viewLists();
+        } else if (cmd == "modify") {
+            id = safe();
+            if (id == -2) {
+                continue;
+            }
+            std::cin >> status;
+            std::getline(std::cin >> std::ws, name);
+            ez4ence.modifyTask(name, status, id - 1);
+        } else if (cmd == "delete") {
+            id = safe();
+            if (id == -2) {
+                continue;
+            }
+            ez4ence.deleteTask(id - 1);
+        } else if (cmd == "newList") {
+            std::getline(std::cin >> std::ws, name);
+            ez4ence.newList(name);
+        } else if (cmd == "delList") {
+            id = safe();
+            if (id == -2) {
+                continue;
+            }
+            ez4ence.deleteList(id - 1);
+        } else if (cmd == "switch") {
+            id = safe();
+            if (id == -2) {
+                continue;
+            }
+            ez4ence.switchList(id - 1);
+        } else if (cmd == "clear") {
+            std::cout << "\033[2J\033[H";
+        } else if (cmd == "rename") {
+            std::getline(std::cin >> std::ws, name);
+            ez4ence.renameList(name);
+        } else if (cmd == "exit") {
+            ez4ence.save();
+            return 0;
+        } else if (cmd == "help") {
+            help();
+        } else if (cmd == "save") {
+            ez4ence.save();
+        } else {
+            std::cout << "\n";
         }
     }
+    return 0;
 }
