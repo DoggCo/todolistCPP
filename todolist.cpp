@@ -105,10 +105,6 @@ class real {
         n.listName = name;
         tList.push_back(n);
     }
-    void delList(int id) {
-        tList.erase(tList.begin() + id);
-        currentList = 0;
-    }
     void switchList(int id) {
         if (!listIdCheck(id)) {
             return;
@@ -156,11 +152,6 @@ class real {
     }
     real() {
         load();
-        if (tList.empty()) {
-            TaskList n;
-            n.listName = "ToDo";
-            tList.push_back(n);
-        }
     }
 };
 
@@ -194,7 +185,6 @@ int safe() {
 
 int main() {
     real ez4ence;
-    // load();
     std::string cmd;
     int id;
     std::string name;
