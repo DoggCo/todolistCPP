@@ -111,6 +111,12 @@ class real {
         }
         currentList = id;
     }
+    void finishTask(int id) {
+        if (!idCheck(id)) {
+            return;
+        }
+        tList[currentList].tasks[id].status = 1;
+    } 
     void save() {
         deleteTxt();
 
@@ -157,20 +163,21 @@ class real {
 
 void help() {
     std::cout << "\nThe current TODO-list you're using will be displayed to the left.\n";
-    std::cout << "new          y|n|/   TASKNAME\n";
-    std::cout << "modify  ID   y|n|/   TASKNAME\n";
-    std::cout << "delete  ID (-1 for all tasks)\n";
-    std::cout << "view                      \n\n";
+    std::cout << "new          y|n|/   TASKNAME  \n";
+    std::cout << "modify  ID   y|n|/   TASKNAME  \n";
+    std::cout << "delete  ID (-1 for all tasks)  \n";
+    std::cout << "finish  ID                     \n";
+    std::cout << "view                         \n\n";
 
-    std::cout << "newList              LISTNAME\n";
-    std::cout << "switch               LIST ID \n";
-    std::cout << "delList              LIST ID \n";
-    std::cout << "viewLists                    \n";
+    std::cout << "newList              LISTNAME  \n";
+    std::cout << "switch               LIST ID   \n";
+    std::cout << "delList              LIST ID   \n";
+    std::cout << "viewLists                      \n";
     std::cout << "rename     (current) LISTNAME\n\n";
     
-    std::cout << "exit                         \n";
-    std::cout << "clear                        \n";
-    std::cout << "save                       \n\n";
+    std::cout << "exit                           \n";
+    std::cout << "clear                          \n";
+    std::cout << "save                         \n\n";
 }
 
 int safe() {
@@ -235,6 +242,12 @@ int main() {
         } else if (cmd == "rename") {
             std::getline(std::cin >> std::ws, name);
             ez4ence.renameList(name);
+        } else if (cmd == "finish") {
+            id = safe();
+            if (id == -2) {
+                continue;
+            }
+            ez4ence.finishTask(id - 1);
         } else if (cmd == "exit") {
             ez4ence.save();
             return 0;
